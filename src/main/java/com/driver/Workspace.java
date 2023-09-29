@@ -45,7 +45,7 @@ public class Workspace extends Gmail{
             Meeting currentMeeting = calendar.get(i);
 
             // If the current meeting doesn't overlap with the previous one, attend it
-            if (currentMeeting.getStartTime().compareTo(prevMeeting.getEndTime()) >= 0) {
+            if (currentMeeting.getStartTime().compareTo(prevMeeting.getEndTime()) > 0) {
                 totalMeetings++;
                 prevMeeting = currentMeeting;
             }
