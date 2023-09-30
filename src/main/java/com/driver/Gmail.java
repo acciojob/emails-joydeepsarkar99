@@ -7,11 +7,23 @@ import java.util.Map;
 
 public class Gmail extends Email {
 
+    class Triplet{
+        Date date;
+        String sender;
+        String message;
+
+        public Triplet(Date date, String sender, String message) {
+            this.date = date;
+            this.sender = sender;
+            this.message = message;
+        }
+    }
+
     int inboxCapacity; //maximum number of mails inbox can store
     //Inbox: Stores mails. Each mail has date (Date), sender (String), message (String). It is guaranteed that message is distinct for all mails.
     //Trash: Stores mails. Each mail has date (Date), sender (String), message (String)
-    LinkedHashMap<String,Container> inbox = new LinkedHashMap<>();
-    ArrayList<Container> trash = new ArrayList<>();
+    ArrayList<Triplet> inbox = new ArrayList<>();
+    ArrayList<Triplet> trash = new ArrayList<>();
    public Gmail(String emailId, int inboxCapacity) {
         super(emailId);
         this.inboxCapacity = inboxCapacity;
@@ -25,25 +37,22 @@ public class Gmail extends Email {
         // 2. The mails are received in non-decreasing order. This means that the date of a new mail is greater than equal to the dates of mails received already.
 
         if(inbox.size() == this.inboxCapacity){
-            int count = 1;
-            for(Map.Entry<String, Container> entry : inbox.entrySet()) {
-                if(count == 1) {
-                    trash.add(entry.getValue());
-                    inbox.remove(entry);
-                    break;
-                }
-                count++;
-            }
+            trash.add(inbox.get(0));
+            inbox.remove(0);
         }
-        else inbox.put(message,new Container(date,sender,message));
+        inbox.add(new Triplet(date,sender,message));
+
     }
 
     public void deleteMail(String message){
         // Each message is distinct
         // If the given message is found in any mail in the inbox, move the mail to trash, else do nothing
-        if(inbox.containsKey(message)){
-            trash.add(inbox.get(message));
-            inbox.remove(message);
+        for(int i=0;i<inbox.size();i++){
+            Triplet obj = inbox.get(i);
+            if(obj.message.equals(message)){
+                trash.add(obj);
+                inbox.remove(i);
+            }
         }
 
     }
@@ -54,32 +63,19 @@ public class Gmail extends Email {
         if(inbox.size() == 0) return null;
 
         StringBuilder latestMsg = new StringBuilder("") ;
-        int count = 1;
-        for(Map.Entry<String, Container> entry : inbox.entrySet()) {
-            if(count == inbox.size()) {
-                Container obj = entry.getValue();
-                latestMsg.append(obj.getMessage());
-                break;
-            }
-            count++;
-        }
+        Triplet obj = inbox.get(inbox.size()-1);
+        latestMsg.append(obj.message);
         return latestMsg.toString();
     }
 
     public String findOldestMessage() {
         // If the inbox is empty, return null
         // Else, return the message of the oldest mail present in the inbox
-        if (inbox.size() == 0) return null;
+        if(inbox.size() == 0) return null;
 
         StringBuilder oldestMsg = new StringBuilder("") ;
-        int count = 1;
-        for (Map.Entry<String, Container> entry : inbox.entrySet()) {
-            if (count == 1) {
-                Container obj = entry.getValue();
-                oldestMsg.append(obj.getMessage());
-            }
-            count++;
-        }
+        Triplet obj = inbox.get(0);
+        oldestMsg.append(obj.message);
         return oldestMsg.toString();
    }
 
@@ -88,13 +84,12 @@ public class Gmail extends Email {
         //find number of mails in the inbox which are received between given dates
         //It is guaranteed that start date <= end date
             int mailCount = 0;
-            for(Map.Entry<String, Container> entry : inbox.entrySet()) {
-                    Container obj = entry.getValue();
-                    Date objDate = obj.getDate();
-                    if (objDate.compareTo(start) >= 0 && objDate.compareTo(end) <= 0){
-                        mailCount++;
-                    }
+            for(Triplet obj : inbox) {
+                Date objDate = obj.date;
+                if (objDate.compareTo(start) >= 0 && objDate.compareTo(end) <= 0){
+                    mailCount++;
                 }
+            }
             return mailCount;
    }
 
