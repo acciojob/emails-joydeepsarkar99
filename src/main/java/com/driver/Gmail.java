@@ -22,11 +22,13 @@ public class Gmail extends Email {
     int inboxCapacity; //maximum number of mails inbox can store
     //Inbox: Stores mails. Each mail has date (Date), sender (String), message (String). It is guaranteed that message is distinct for all mails.
     //Trash: Stores mails. Each mail has date (Date), sender (String), message (String)
-    ArrayList<Triplet> inbox = new ArrayList<>();
-    ArrayList<Triplet> trash = new ArrayList<>();
+    private ArrayList<Triplet> inbox;
+    private ArrayList<Triplet> trash;
    public Gmail(String emailId, int inboxCapacity) {
         super(emailId);
         this.inboxCapacity = inboxCapacity;
+        this.inbox = new ArrayList<>();
+        this.trash = new ArrayList<>();
 
     }
 
@@ -47,12 +49,17 @@ public class Gmail extends Email {
     public void deleteMail(String message){
         // Each message is distinct
         // If the given message is found in any mail in the inbox, move the mail to trash, else do nothing
+        int idx = -1;
         for(int i=0;i<inbox.size();i++){
             Triplet obj = inbox.get(i);
             if(obj.message.equals(message)){
-                trash.add(obj);
-                inbox.remove(i);
+                idx = i;
+                break;
             }
+        }
+        if(idx != -1){
+            trash.add(inbox.get(idx));
+            inbox.remove(idx);
         }
 
     }
@@ -61,22 +68,14 @@ public class Gmail extends Email {
         // If the inbox is empty, return null
         // Else, return the message of the latest mail present in the inbox
         if(inbox.size() == 0) return null;
-
-        StringBuilder latestMsg = new StringBuilder("") ;
-        Triplet obj = inbox.get(inbox.size()-1);
-        latestMsg.append(obj.message);
-        return latestMsg.toString();
+        return inbox.get(inbox.size()-1).message;
     }
 
     public String findOldestMessage() {
         // If the inbox is empty, return null
         // Else, return the message of the oldest mail present in the inbox
         if(inbox.size() == 0) return null;
-
-        StringBuilder oldestMsg = new StringBuilder("") ;
-        Triplet obj = inbox.get(0);
-        oldestMsg.append(obj.message);
-        return oldestMsg.toString();
+        return inbox.get(0).message;
    }
 
 
