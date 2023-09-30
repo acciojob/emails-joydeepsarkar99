@@ -18,35 +18,42 @@ public class Email {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public void changePassword(String oldPassword, String newPassword){
-        //Change password only if the oldPassword is equal to current password and the new password meets all of the following:
+        //Change password only if the oldPassword is equal to current password and the new password meets all the following:
         // 1. It contains at least 8 characters
         // 2. It contains at least one uppercase letter
         // 3. It contains at least one lowercase letter
         // 4. It contains at least one digit
         // 5. It contains at least one special character. Any character apart from alphabets and digits is a special character
 
+        if(oldPassword.equals(password)){
+            if (isValid(newPassword)) {
+                System.out.println("Password changed successfully");
+                this.password = newPassword;
+            }
+            else System.out.println("Password is not valid");
+        }
+        else{
+            System.out.println("Password mismatch");
+        }
+
+    }
+    private boolean isValid(String password){
         boolean isUpperCase = false;
         boolean isLowerCase = false;
         boolean isDigit = false;
         boolean isSpecial = false;
-        boolean isLength = false;
-        if(oldPassword.equals(getPassword())){
-            if(newPassword.length() == 8) isLength = true;
-            for(int i=0;i<newPassword.length();i++){
-                char c = newPassword.charAt(i);
-                if(Character.isUpperCase(c)) isUpperCase = true;
-                if(Character.isLowerCase(c)) isLowerCase = true;
-                if(Character.isDigit(c)) isDigit = true;
-                if(!Character.isDigit(c) && !Character.isUpperCase(c) && !Character.isLowerCase(c)) isSpecial = true;
-            }
-            if(isLength && isUpperCase && isLowerCase && isDigit && isSpecial){
-                setPassword(newPassword);
-            }
+
+        if(password.length() < 8) return false;
+
+        for(int i=0;i<password.length();i++){
+            char c = password.charAt(i);
+            if(Character.isUpperCase(c)) isUpperCase = true;
+            else if(Character.isLowerCase(c)) isLowerCase = true;
+            else if(Character.isDigit(c)) isDigit = true;
+            else isSpecial = true;
         }
+        if(isUpperCase && isLowerCase && isDigit && isSpecial) return true;
+        return false;
     }
 }
